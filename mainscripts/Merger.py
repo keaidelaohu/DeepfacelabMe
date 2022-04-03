@@ -32,8 +32,9 @@ def main (model_class_name=None,
     io.log_info ("Running merger.\r\n")
 
     saved_models_k=kwargs.get('saved_models_type', None)
-    #io.log_info ("mode tpye :"+str(saved_models_k))
     gl.set_value('saved_models_global',saved_models_k) #kingboy global var
+    if saved_models_k !=None:
+        io.log_info ("合成提示：已启用了Deefacelab Me的规格读取：:"+saved_models_k)
 
     try:
         if not input_path.exists():

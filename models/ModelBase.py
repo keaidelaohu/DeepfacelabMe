@@ -808,7 +808,7 @@ class ModelBase(object):
                 summary_text += [f'=={"VRAM": >{width_name}}: {vram_str: <{width_value}}==']
         summary_text += [f'=={" "*width_total}==']
         summary_text += [f'=={" DeepFaceLab Me 2022 Sp1": ^{width_total}}==']
-        summary_text += [f'=={" RG 2.3 version was edited by kingboy! ":-^{width_total}}==']
+        summary_text += [f'=={" RG 2.42 version was edited by kingboy! ":-^{width_total}}==']
         summary_text += [f'  {" "*width_total}  ']
         summary_text = "\n".join (summary_text)
         return summary_text

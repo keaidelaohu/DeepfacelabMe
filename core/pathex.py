@@ -23,7 +23,7 @@ def write_bytes_safe_j(p, dd_data):
     p_tmp = p.parent / (p.name + '.tmp')
 
     with open(p_tmp, 'wb') as fo:
-       joblib.dump(dd_data, fo)
+       joblib.dump(dd_data, fo,compress=True)
 
     if p.exists():
         p.unlink()

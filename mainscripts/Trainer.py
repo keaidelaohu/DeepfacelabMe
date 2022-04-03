@@ -36,8 +36,9 @@ class TensorBoardTool:
             tb_argv.append("--bind_all")
         tb.configure(argv=tb_argv)
         url = tb.launch()
-        io.log_info('Launched TensorBoard at {}\n'.format(url))
-
+        io.log_info('\n')
+        io.log_info('TensorBoard 可视化工具已启动!\n')
+        io.log_info('浏览器登陆地址为： {}\n'.format(url))
 def process_img_for_tensorboard(input_img):
     # convert format from bgr to rgb
     img = cv2.cvtColor(input_img, cv2.COLOR_BGR2RGB)
@@ -157,8 +158,7 @@ def trainerThread (s2c, c2s, e,
             def send_preview():
                 if not debug:
                     previews = model.get_previews()
-                    c2s.put({'op': 'show', 'previews': previews, 'iter': model.get_iter(),
-                             'loss_history': model.get_loss_history().copy()})
+                    c2s.put ( {'op': 'show', 'previews': previews, 'iter': model.get_iter(), 'loss_history': model.get_loss_history().copy()})
                 else:
                     previews = [('debug, press update for new', model.debug_one_iter())]
                     c2s.put({'op': 'show', 'previews': previews})
@@ -218,8 +218,7 @@ def trainerThread (s2c, c2s, e,
 
                             if sys.platform[0:3] == 'win':
                                 io.log_info("!!!")
-                                io.log_info(
-                                    "Windows 10 users IMPORTANT notice. You should set this setting in order to work correctly.")
+                                io.log_info("Windows 10 users IMPORTANT notice. You should set this setting in order to work correctly.")
                                 io.log_info("https://i.imgur.com/B7cmDCB.jpg")
                                 io.log_info("!!!")
 
@@ -360,7 +359,7 @@ def handle_tensorboard_op(input):
             src_loss = input['src_loss']
             dst_loss = input['dst_loss']
             # report iteration time summary
-            train_summary_writer.add_scalar('iteration time', step_time, step)
+            train_summary_writer.add_scalar('迭代时间', step_time, step)
             # report loss summary
             train_summary_writer.add_scalar('loss/src', src_loss, step)
             if dst_loss is not None:
@@ -370,9 +369,9 @@ def handle_tensorboard_op(input):
             previews = input['previews']
             static_previews = input['static_previews']
             if previews is not None:
-                log_tensorboard_previews(step, previews, 'preview', train_summary_writer)
+                log_tensorboard_previews(step, previews, '预览', train_summary_writer)
             if static_previews is not None:
-                log_tensorboard_previews(step, static_previews, 'static_preview', train_summary_writer)
+                log_tensorboard_previews(step, static_previews, '静态预览_k', train_summary_writer)
     
 
 class Zoom(Enum):
