@@ -175,10 +175,10 @@ def trainerThread (s2c, c2s, e,
             else:
                 io.log_info('Starting. Press "Enter" to stop training and save model.')
             #K Training Auto Save
-            if 1 <= training_time_state <= 480:
+            if 1 <= training_time_state <= 600:
                 io.log_info('This model training will be automatically saved and closed after %d minutes.'% (training_time_state))
                 training_time_state = training_time_state * 60
-            elif -480 <= training_time_state < 0:
+            elif -600 <= training_time_state < 0:
                 io.log_info('This model training will be automatically saved in %d minutes and try to turn off the computer.'% (-1*training_time_state))
                 training_time_state = training_time_state * -60
                 auto_shutdown = True
