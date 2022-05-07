@@ -11,4 +11,4 @@ def print_logo_info():
         print(("*"*tree_count).center(width))
         tree_count +=2
     print("|@~@|".center(width))
-    print ('-> Deeplacelab Me 2022sp1 Ver 2.5 - This RG version was edited by kingboy!(2022.4.04)')
+    print ('-> Deeplacelab Me 2022sp1 Ver 2.51 - This RG version was edited by kingboy!(2022.5.07)')
