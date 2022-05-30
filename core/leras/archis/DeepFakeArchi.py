@@ -67,6 +67,7 @@ class DeepFakeArchi(nn.ArchiBase):
                 def on_build(self, in_ch, out_ch, kernel_size=3):
                     self.conv1 = nn.Conv2D( in_ch, out_ch*4, kernel_size=kernel_size, padding='SAME', dtype=conv_dtype)
 
+                @nn.recompute_grad
                 def forward(self, x):
                     x = self.conv1(x)
                     x = act(x, 0.1)
@@ -78,6 +79,7 @@ class DeepFakeArchi(nn.ArchiBase):
                     self.conv1 = nn.Conv2D( ch, ch, kernel_size=kernel_size, padding='SAME', dtype=conv_dtype)
                     self.conv2 = nn.Conv2D( ch, ch, kernel_size=kernel_size, padding='SAME', dtype=conv_dtype)
 
+                @nn.recompute_grad
                 def forward(self, inp):
                     x = self.conv1(inp)
                     x = act(x, 0.2)
@@ -103,6 +105,7 @@ class DeepFakeArchi(nn.ArchiBase):
                     else:
                         self.down1 = DownscaleBlock(self.in_ch, self.e_ch, n_downscales=4 if 't' not in opts else 5, kernel_size=5)
 
+                @nn.recompute_grad
                 def forward(self, x):
                     if use_fp16:
                         x = tf.cast(x, tf.float16)
@@ -146,6 +149,7 @@ class DeepFakeArchi(nn.ArchiBase):
                     if 't' not in opts:
                         self.upscale1 = Upscale(ae_out_ch, ae_out_ch)
 
+                @nn.recompute_grad
                 def forward(self, inp):
                     x = inp
                     x = self.dense1(x)
@@ -216,7 +220,7 @@ class DeepFakeArchi(nn.ArchiBase):
                             self.out_convm = nn.Conv2D( d_mask_ch*2, 1, kernel_size=1, padding='SAME', dtype=conv_dtype)
 
                 
-                    
+                @nn.recompute_grad    
                 def forward(self, z):
                     x = self.upscale0(z)
                     x = self.res0(x)

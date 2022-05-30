@@ -311,15 +311,17 @@ class ModelBase(object):
     def update_sample_for_preview(self, choose_preview_history=False, force_new=False):
         if self.sample_for_preview is None or choose_preview_history or force_new:
             if choose_preview_history and io.is_support_windows():
-                wnd_name = "[p] - next. [space] - switch preview type. [enter] - confirm."
+                wnd_name = "[p] - next. [space] - switch preview type. [enter] - confirm. [k] - help"
                 io.log_info (f"Choose image for the preview history. {wnd_name}")
                 io.named_window(wnd_name)
                 io.capture_keys(wnd_name)
                 choosed = False
                 preview_id_counter = 0
+                mask_changed = False
                 while not choosed:
-                    self.sample_for_preview = self.generate_next_samples()
-                    previews = self.get_history_previews()
+                    if not mask_changed:
+                        self.sample_for_preview = self.generate_next_samples()
+                        previews = self.get_history_previews()
 
                     io.show_image( wnd_name, ( previews[preview_id_counter % len(previews) ][1] *255).astype(np.uint8) )
 
@@ -331,8 +333,10 @@ class ModelBase(object):
                             break
                         elif key == ord(' '):
                             preview_id_counter += 1
+                            mask_changed = True
                             break
                         elif key == ord('p'):
+                            if mask_changed: mask_changed = False
                             break
 
                         try:
@@ -811,8 +815,8 @@ class ModelBase(object):
                 vram_str = f'{device.total_mem_gb:.2f}GB' # GPU VRAM - Formated as #.## (or ##.##)
                 summary_text += [f'=={"VRAM": >{width_name}}: {vram_str: <{width_value}}==']
         summary_text += [f'=={" "*width_total}==']
-        summary_text += [f'=={" DeepFaceLab Me 2022 Sp1": ^{width_total}}==']
-        summary_text += [f'=={" RG 2.51 version was edited by kingboy! ":-^{width_total}}==']
+        summary_text += [f'=={" Deepfacelab Me 2022 Sp1": ^{width_total}}==']
+        summary_text += [f'=={" RG 2.52 version was edited by kingboy! ":-^{width_total}}==']
         summary_text += [f'  {" "*width_total}  ']
         summary_text = "\n".join (summary_text)
         return summary_text

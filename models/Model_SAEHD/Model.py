@@ -28,7 +28,7 @@ class SAEHDModel(ModelBase):
             suggest_batch_size = 4
 
         min_res = 64
-        max_res = 640
+        max_res = 1024
 
         default_usefp16            = self.options['use_fp16']           = self.load_or_def_option('use_fp16', False)
         default_resolution         = self.options['resolution']         = self.load_or_def_option('resolution', 128)
@@ -124,7 +124,7 @@ class SAEHDModel(ModelBase):
 
         if self.is_first_run():
             if (self.read_from_conf and not self.config_file_exists) or not self.read_from_conf:
-                resolution = io.input_int("Resolution", default_resolution, add_info="64-640", help_message="More resolution requires more VRAM and time to train. Value will be adjusted to multiple of 16 and 32 for -d archi.")
+                resolution = io.input_int("Resolution", default_resolution, add_info="64-1024", help_message="More resolution requires more VRAM and time to train. Over 640 resolution, please enable [--saved-models-type readjob-savejob] option. Value will be adjusted to multiple of 16 and 32 for -d archi.")
                 resolution = np.clip ( (resolution // 16) * 16, min_res, max_res)
                 self.options['resolution'] = resolution
                 self.options['face_type'] = io.input_str ("Face type", default_face_type, ['h','mf','f','wf','head', 'custom'], help_message="Half / mid face / full face / whole face / head / custom. Half face has better resolution, but covers less area of cheeks. Mid face is 30% wider than half face. 'Whole face' covers full area of face include forehead. 'head' covers full head, but requires XSeg for src and dst faceset.").lower()

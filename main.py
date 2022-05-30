@@ -166,7 +166,7 @@ if __name__ == "__main__":
     p.add_argument('--config-training-file', action=fixPathAction, dest="config_training_file", help="Path to custom yaml configuration file")
     p.add_argument('--auto-gen-config', action="store_true", dest="auto_gen_config", default=False, help="Saves a configuration file for each model used in the trainer. It'll have the same model name")
     p.add_argument('--saved-models-type', default=None, dest="saved_models_type",help="Saves model file type")    
-    p.add_argument('--training-time', type=int, default=0,dest="training_time",help="Automatically save the model training and close the training time range. Set it to 0, do not enable automatic operation, and set the range to 0-480 minutes.")
+    p.add_argument('--training-time', type=int, default=0,dest="training_time",help="Automatically save the model training and close the training time range. Set it to 0, do not enable automatic operation, and set the range to 0-600 minutes.")
     
     p.add_argument('--dump-ckpt', action="store_true", dest="dump_ckpt", default=False, help="Dump the model to ckpt format.")
     p.add_argument('--flask-preview', action="store_true", dest="flask_preview", default=False,
@@ -379,7 +379,7 @@ if __name__ == "__main__":
     arguments.func(arguments)
 
     if exit_code == 0:
-        print ("Done.")
+        print ("Done...")
 
     exit(exit_code)
 

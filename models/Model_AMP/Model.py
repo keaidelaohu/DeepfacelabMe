@@ -112,8 +112,8 @@ class AMPModel(ModelBase):
 
         if self.is_first_run():
             if (self.read_from_conf and not self.config_file_exists) or not self.read_from_conf:
-                resolution = io.input_int("Resolution", default_resolution, add_info="64-640", help_message="More resolution requires more VRAM and time to train. Value will be adjusted to multiple of 32 .")
-                resolution = np.clip ( (resolution // 32) * 32, 64, 640)
+                resolution = io.input_int("Resolution", default_resolution, add_info="64-1024", help_message="More resolution requires more VRAM and time to train, please enable [--saved-models-type readjob-savejob] option. Value will be adjusted to multiple of 32 .")
+                resolution = np.clip ( (resolution // 32) * 32, 64, 1024)
                 self.options['resolution'] = resolution
                 self.options['face_type'] = io.input_str ("Face type", default_face_type, ['h','mf','f','wf','head', 'custom'], help_message="Half / mid face / full face / whole face / head / custom. Half face has better resolution, but covers less area of cheeks. Mid face is 30% wider than half face. 'Whole face' covers full area of face include forehead. 'head' covers full head, but requires XSeg for src and dst faceset.").lower()
 

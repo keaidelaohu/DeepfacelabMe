@@ -11,6 +11,7 @@ class XSeg(nn.ModelBase):
                 self.frn = nn.FRNorm2D(out_ch)
                 self.tlu = nn.TLU(out_ch)
 
+            @nn.recompute_grad
             def forward(self, x):                
                 x = self.conv(x)
                 x = self.frn(x)
@@ -23,6 +24,7 @@ class XSeg(nn.ModelBase):
                 self.frn = nn.FRNorm2D(out_ch)
                 self.tlu = nn.TLU(out_ch)
 
+            @nn.recompute_grad
             def forward(self, x):
                 x = self.conv(x)
                 x = self.frn(x)
@@ -89,7 +91,7 @@ class XSeg(nn.ModelBase):
         self.uconv01 = ConvBlock(base_ch, base_ch)
         self.out_conv = nn.Conv2D (base_ch, out_ch, kernel_size=3, padding='SAME')
     
-        
+    @nn.recompute_grad        
     def forward(self, inp, pretrain=False):
         x = inp
 

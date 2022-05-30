@@ -1,12 +1,10 @@
 import numpy as np
 from core.leras import nn
 tf = nn.tf
+
 from tensorflow.python.ops import array_ops, random_ops, math_ops, sparse_ops, gradients
 from tensorflow.python.framework import sparse_tensor
-
-def tf_get_value(tensor):
-    return nn.tf_sess.run (tensor)
-nn.tf_get_value = tf_get_value
+from tensorflow.python.util import nest
 
 
 def batch_set_value(tuples):
@@ -50,6 +48,35 @@ def init_weights(weights):
     if len(ca_tuples) != 0:
         nn.batch_set_value( [*zip(ca_tuples_w, nn.initializers.ca.generate_batch (ca_tuples))] )
 nn.init_weights = init_weights
+
+def recompute_grad(call):
+    def inner(self, *inputs, **kwargs):
+        is_function = tf.is_tensor(self)
+
+        @tf.custom_gradient
+        def call_grad(*inputs):
+            def kernel_call():
+                if is_function:
+                    return call(*inputs, **kwargs)
+                else:
+                    return call(self, *inputs, **kwargs)            
+            re_compute_out = kernel_call()
+            def grad_fn(*doutputs, variables=None):
+                with tf.control_dependencies(doutputs):
+                    re_compute_out = kernel_call()               
+                watches = nest.flatten(inputs)
+                if variables is not None:
+                    watches += nest.flatten(variables)               
+                compute_grads = tf.gradients(re_compute_out, watches, doutputs)
+                return compute_grads[:len(inputs)], compute_grads[len(inputs):]
+            return re_compute_out, grad_fn
+
+        if is_function:
+            return call_grad(self, *inputs)
+        else:
+            return call_grad(*inputs)
+    return inner
+nn.recompute_grad = recompute_grad
 
 def tf_gradients ( loss, vars ):
     grads = gradients.gradients(loss, vars, colocate_gradients_with_ops=True )
@@ -278,6 +305,7 @@ def style_loss(target, style, gaussian_blur_radius=0.0, loss_weight=1.0, step_si
 
 nn.style_loss = style_loss
 
+@nn.recompute_grad
 def dssim(img1,img2, max_val, filter_size=11, filter_sigma=1.5, k1=0.01, k2=0.03):
     if img1.dtype != img2.dtype:
         raise ValueError("img1.dtype != img2.dtype")
@@ -324,12 +352,12 @@ def dssim(img1,img2, max_val, filter_size=11, filter_sigma=1.5, k1=0.01, k2=0.03
     if not_float32:
         dssim = tf.cast(dssim, img_dtype)
     return dssim
-
 nn.dssim = dssim
 
 def space_to_depth(x, size):
     if nn.data_format == "NHWC":
         # match NCHW version in order to switch data_format without problems
+
         b,h,w,c = x.shape.as_list()
         oh, ow = h // size, w // size
         x = tf.reshape(x, (-1, size, oh, size, ow, c))
@@ -371,6 +399,7 @@ def rgb_to_lab(srgb):
     linear_mask = tf.cast(srgb_pixels <= 0.04045, dtype=tf.float32)
     exponential_mask = tf.cast(srgb_pixels > 0.04045, dtype=tf.float32)
     rgb_pixels = (srgb_pixels / 12.92 * linear_mask) + (((srgb_pixels + 0.055) / 1.055) ** 2.4) * exponential_mask
+
     rgb_to_xyz = tf.constant([
         #    X        Y          Z
         [0.412453, 0.212671, 0.019334], # R
@@ -382,6 +411,7 @@ def rgb_to_lab(srgb):
     xyz_normalized_pixels = tf.multiply(xyz_pixels, [1/0.950456, 1.0, 1/1.088754])
 
     epsilon = 6/29
+
     linear_mask = tf.cast(xyz_normalized_pixels <= (epsilon**3), dtype=tf.float32)
     exponential_mask = tf.cast(xyz_normalized_pixels > (epsilon**3), dtype=tf.float32)
     fxfyfz_pixels = (xyz_normalized_pixels / (3 * epsilon**2) + 4/29) * linear_mask + (xyz_normalized_pixels ** (1/3)) * exponential_mask
@@ -394,6 +424,7 @@ def rgb_to_lab(srgb):
     ])
     lab_pixels = tf.matmul(fxfyfz_pixels, fxfyfz_to_lab) + tf.constant([-16.0, 0.0, 0.0])
     return tf.reshape(lab_pixels, tf.shape(srgb))
+
 nn.rgb_to_lab = rgb_to_lab
 
 def total_variation_mse(images):
@@ -406,6 +437,7 @@ def total_variation_mse(images):
     tot_var = ( tf.reduce_sum(tf.square(pixel_dif1), axis=[1,2,3]) +
                 tf.reduce_sum(tf.square(pixel_dif2), axis=[1,2,3]) )
     return tot_var
+
 nn.total_variation_mse = total_variation_mse
 
 
